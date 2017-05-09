@@ -13,6 +13,7 @@ import datetime
 import mmap
 import re
 import contextlib
+import shutil
 
 
 class MultiColorsPlugin(octoprint.plugin.AssetPlugin,
@@ -62,6 +63,8 @@ class MultiColorsPlugin(octoprint.plugin.AssetPlugin,
 	def inject_gcode(self, file, layers, find_string, gcode):
 		try:
 			marker = "; multi color"
+			file_new = file.replace(".gcode", ".multicolor.gcode")
+			shutil.copyfile(file, file_new);
 			line_found = False
 			with open(file, "r") as f:
 			    line_found = any(marker in line for line in f)
@@ -69,9 +72,9 @@ class MultiColorsPlugin(octoprint.plugin.AssetPlugin,
 			found = 0
 			replace  = ur'\1\n{0}\n{1}\n'.format(marker, gcode)
 			for layer in layers:
-				with open(file, 'r+') as f:
+				with open(file_new, 'r+') as f:
 					self._logger.info("Trying to insert multi color code for layer '%s'..."%layer)
-					search = re.compile(ur'({0}$)'.format( find_string.format(layer = int(layer))) , re.MULTILINE)
+					search = re.compile(ur'({0}$)'.format( find_string.format(layer = layer)) , re.MULTILINE)
 					self._logger.debug(search.pattern)
 					with contextlib.closing(mmap.mmap(f.fileno(), 0)) as m:
 						test = re.search(search, m)
