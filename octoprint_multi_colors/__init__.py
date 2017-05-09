@@ -63,6 +63,8 @@ class MultiColorsPlugin(octoprint.plugin.AssetPlugin,
 	def inject_gcode(self, file, layers, find_string, gcode):
 		try:
 			marker = "; multi color"
+			#TODO: refresh file manager/use filemanager api for copying
+			#TODO: use settings for new files/allowing non-int values
 			file_new = file.replace(".gcode", ".multicolor.gcode")
 			shutil.copyfile(file, file_new);
 			line_found = False
